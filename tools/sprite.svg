@@ -1,5 +1,6 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
 <defs>
+<clipPath id="wv-h4" clipPathUnits="objectBoundingBox"><ellipse cx="0.1250" cy=".5" rx="0.2300" ry=".5"/><ellipse cx="0.3750" cy=".5" rx="0.2300" ry=".5"/><ellipse cx="0.6250" cy=".5" rx="0.2300" ry=".5"/><ellipse cx="0.8750" cy=".5" rx="0.2300" ry=".5"/></clipPath>
 <clipPath id="wv-h6" clipPathUnits="objectBoundingBox"><ellipse cx="0.0833" cy=".5" rx="0.1533" ry=".5"/><ellipse cx="0.2500" cy=".5" rx="0.1533" ry=".5"/><ellipse cx="0.4167" cy=".5" rx="0.1533" ry=".5"/><ellipse cx="0.5833" cy=".5" rx="0.1533" ry=".5"/><ellipse cx="0.7500" cy=".5" rx="0.1533" ry=".5"/><ellipse cx="0.9167" cy=".5" rx="0.1533" ry=".5"/></clipPath>
 <clipPath id="wv-h5" clipPathUnits="objectBoundingBox"><ellipse cx="0.1000" cy=".5" rx="0.1840" ry=".5"/><ellipse cx="0.3000" cy=".5" rx="0.1840" ry=".5"/><ellipse cx="0.5000" cy=".5" rx="0.1840" ry=".5"/><ellipse cx="0.7000" cy=".5" rx="0.1840" ry=".5"/><ellipse cx="0.9000" cy=".5" rx="0.1840" ry=".5"/></clipPath>
 <clipPath id="wv-v4" clipPathUnits="objectBoundingBox"><ellipse cx=".5" cy="0.1250" rx=".5" ry="0.2300"/><ellipse cx=".5" cy="0.3750" rx=".5" ry="0.2300"/><ellipse cx=".5" cy="0.6250" rx=".5" ry="0.2300"/><ellipse cx=".5" cy="0.8750" rx=".5" ry="0.2300"/></clipPath>

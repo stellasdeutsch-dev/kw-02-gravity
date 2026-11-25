@@ -200,8 +200,8 @@
         "role": "автор Dias English",
         "photo": {
           "src": "dias-author.webp",
-          "w": 502,
-          "h": 572,
+          "w": 900,
+          "h": 1200,
           "alt": "Диас"
         },
         "hat": "pic-hat.webp",
@@ -222,8 +222,8 @@
           {
             "title": "Казыгурт",
             "text": "Диас из аула Казыгурт.",
-            "img": "dias-avatar.webp",
-            "alt": "Диас"
+            "img": "dias-coffee.webp",
+            "alt": "Диас с чашкой кофе"
           },
           {
             "title": "НИШ",
@@ -235,7 +235,7 @@
             "title": "Sapienza, Рим",
             "text": "Сейчас учится в Sapienza в Риме. Говорит на английском, итальянском и русском.",
             "img": "ds-colosseum.webp",
-            "alt": "Диас у Колизея в Риме"
+            "alt": "Диас в Колизее"
           }
         ]
       },
