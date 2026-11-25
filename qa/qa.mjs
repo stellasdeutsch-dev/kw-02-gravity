@@ -6,7 +6,8 @@ const OUT = new URL('./shots/', import.meta.url).pathname; mkdirSync(OUT, { recu
 const b = await chromium.launch({ channel: 'chrome', args: ['--mute-audio'] });
 const report = [];
 let fail = 0;
-for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) {
+const BUY = { en: 'https://app.lava.top/products/2c950aa0-d8be-4317-8f39-0f9b4016f5da', tr: 'https://app.lava.top/products/2cdbb9f8-e65b-443e-8d2c-4fea4c121e41' };
+for (const [ver, path] of [['en', 'en/'], ['en-lesson', 'en/lesson/'], ['tr', 'tr/'], ['tr-lesson', 'tr/lesson/']]) {
   for (const w of [1440, 834, 390]) {
     const ctx = await b.newContext({ viewport: { width: w, height: w > 800 ? 900 : 844 }, deviceScaleFactor: 1 });
     const p = await ctx.newPage(); const errs = [];
@@ -32,9 +33,11 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) {
       const buy = [...document.querySelectorAll('a[href*="lava.top"]')].map(a => a.href);
       return { scrollW: document.documentElement.scrollWidth, imgs: imgs.length, bad, lazyMiss, noAlt, noSize, over: [...new Set(over)].slice(0, 8), buy: [...new Set(buy)], buyN: buy.length, h: document.body.scrollHeight };
     });
-    const ok = res.status() === 200 && m.scrollW === w && m.bad.length === 0 && errs.length === 0 && m.noAlt === 0 && m.noSize === 0;
+    const lang = ver.slice(0, 2), isLesson = ver.endsWith('lesson');
+    const buyOk = isLesson ? m.buyN === 0 : (m.buy.length === 1 && m.buy[0] === BUY[lang]);
+    const ok = res.status() === 200 && m.scrollW === w && m.bad.length === 0 && errs.length === 0 && m.noAlt === 0 && m.noSize === 0 && buyOk;
     if (!ok) fail++;
-    report.push({ ver, w, status: res.status(), ...m, errs });
+    report.push({ ver, w, status: res.status(), buyOk, ...m, errs });
     await p.screenshot({ path: `${OUT}02_${ver}_${w}_first.png` });
     await p.screenshot({ path: `${OUT}02_${ver}_${w}_full.png`, fullPage: true });
     const ad = await p.$('.ad');
@@ -42,11 +45,22 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) {
     await ctx.close();
   }
 }
-// интерактив: вопросы, карусель, меню (1440, версия с рекламой)
+// переадресация: корень на /en/, старый /lesson/ на /tr/lesson/
+{
+  const p = await b.newPage();
+  const r = {};
+  await p.goto(BASE, { waitUntil: 'networkidle' }); r.root = new URL(p.url()).pathname;
+  await p.goto(BASE + 'lesson/', { waitUntil: 'networkidle' }); r.lesson = new URL(p.url()).pathname;
+  r.ok = r.root.endsWith('/en/') && r.lesson.endsWith('/tr/lesson/');
+  report.push({ redirect: r }); if (!r.ok) fail++;
+  await p.close();
+}
+// интерактив: вопросы, карусель, меню, переключатель языка (1440, en)
 {
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
-  await p.goto(BASE, { waitUntil: 'networkidle' });
+  await p.goto(BASE + 'en/', { waitUntil: 'networkidle' });
   const r = {};
+  r.langLink = await p.locator('.lang-a[hreflang=tr]').getAttribute('href') === '../tr/';
   const q = p.locator('#faq .qa').first(); await q.locator('.qa-btn').click(); await p.waitForTimeout(500);
   r.faqOpen = await q.evaluate(e => e.classList.contains('open')) && await p.locator('#faq .qa.open').count() === 1;
   const next = p.locator('#inside .arr.next'); await next.scrollIntoViewIfNeeded(); const t0 = await p.locator('#inside .car-track').evaluate(e => e.style.transform); await next.click(); await p.waitForTimeout(700);
@@ -59,6 +73,6 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) {
 }
 await b.close();
 writeFileSync(new URL('./qa-report.json', import.meta.url), JSON.stringify(report, null, 1));
-for (const r of report) console.log(r.interactive ? 'interactive ' + JSON.stringify(r.interactive) : `${r.ver.padEnd(6)} ${r.w} status=${r.status} scrollW=${r.scrollW} imgs=${r.imgs} bad=${r.bad.length} noAlt=${r.noAlt} noSize=${r.noSize} lazyMiss=${r.lazyMiss} buyLinks=${r.buyN} ${JSON.stringify(r.buy)} errs=${r.errs.length} over=${JSON.stringify(r.over)} h=${r.h}`);
+for (const r of report) console.log(r.redirect ? 'redirect ' + JSON.stringify(r.redirect) : r.interactive ? 'interactive ' + JSON.stringify(r.interactive) : `${r.ver.padEnd(9)} ${r.w} status=${r.status} buyOk=${r.buyOk} scrollW=${r.scrollW} imgs=${r.imgs} bad=${r.bad.length} noAlt=${r.noAlt} noSize=${r.noSize} lazyMiss=${r.lazyMiss} buyLinks=${r.buyN} ${JSON.stringify(r.buy)} errs=${r.errs.length} over=${JSON.stringify(r.over)} h=${r.h}`);
 console.log(fail ? `FAIL: ${fail}` : 'ALL OK');
 process.exit(fail ? 1 : 0);

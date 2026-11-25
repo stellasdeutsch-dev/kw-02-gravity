@@ -1,20 +1,21 @@
-// Сборка сайта 02 из content.js: gh/index.html (с рекламой) и gh/lesson/index.html (без рекламы).
+// Сборка сайта 02 из content.en.json и content.tr.json:
+// gh/en/ и gh/tr/ (с рекламой), gh/en/lesson/ и gh/tr/lesson/ (без рекламы),
+// gh/index.html ведёт на /en/, старые /lesson/ ведёт на /tr/lesson/.
 // Запуск из папки сайта: node tools/build.mjs
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const C = (await import(pathToFileURL(resolve(ROOT, 'content.js')).href + '?t=' + Date.now())).default;
-if (process.env.AD) C.ad = process.env.AD; // проверка второй платформы: AD=dias node tools/build.mjs
-const AD = C.ads[C.ad];
-if (!AD) throw new Error(`content.js: ad "${C.ad}" не найден, есть: ${Object.keys(C.ads).join(', ')}`);
+const LANGS = ['en', 'tr'];
+let C, AD; // текущая вариация (меняется в цикле сборки)
 
 // ---------- текст ----------
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // неразрывный пробел после коротких слов, чтобы одна-две буквы не висели в конце строки
 const nb = s => s.replace(/(^|[\s(«])([А-Яа-яЁёA-Za-z0-9]{1,2})\s/g, '$1$2 ').replace(/(^|[\s(«])([А-Яа-яЁёA-Za-z0-9]{1,2})\s/g, '$1$2 ');
-const T = s => nb(esc(s)).replace(/\*([^*]+)\*/g, '<em class="hl">$1</em>').replace(/\n/g, '<br>');
+// *слово* выделяется цветом, [[фраза]] помечается языком вариации (en/tr)
+const T = s => nb(esc(s)).replace(/\*([^*]+)\*/g, '<em class="hl">$1</em>').replace(/\[\[([^\]]+)\]\]/g, (m, p) => `<span class="fx" lang="${C.exampleLang}">${p}</span>`).replace(/\n/g, '<br>');
 const attr = esc;
 const link = (href) => href === 'BUY' ? AD.buy : href;
 const ext = href => /^https?:/.test(href);
@@ -70,7 +71,7 @@ const R = {
 </section>`;
   },
   rows(b) {
-    const items = b.items.map((r, i) => `<div class="row c-${r.color || ROWC[i % ROWC.length]} rv"><h3>${T(r.title)}</h3><p>${T(r.text)}</p>${imgAuto(r.img, r.alt, 'row-pic')}</div>`).join('');
+    const items = b.items.map((r, i) => `<div class="row c-${r.color || ROWC[i % ROWC.length]} rv"><h3>${T(r.title)}</h3><p>${T(r.text)}</p>${r.img ? imgAuto(r.img, r.alt, 'row-pic') : '<span></span>'}</div>`).join('');
     return `<section class="sec rows-sec" id="${b.id || ''}" data-block="rows">
   ${b.title ? `<h2 class="display rv">${T(b.title)}</h2>` : ''}
   <div class="rows">${items}</div>
@@ -124,7 +125,8 @@ const R = {
 </section>`;
   },
   author(b) {
-    return `<section class="sec author-sec" data-block="author">
+    return `<section class="sec author-sec" data-block="author"${b.id ? ` id="${b.id}"` : ''}>
+  ${b.title ? `<h2 class="display rv">${T(b.title)}</h2>` : ''}
   <div class="wave rv">
     <div class="wave-photo">${img(b.photo.src, b.photo.w, b.photo.h, b.photo.alt)}</div>
     <div class="wave-text">
@@ -132,6 +134,7 @@ const R = {
         <div class="wave-head"><div><b>${T(b.name)}</b><span>${T(b.role)}</span></div>${b.hat ? imgAuto(b.hat, '', 'wave-hat') : ''}</div>
         <p class="wave-q">«${T(b.quote)}»</p>
         <p class="sig" aria-hidden="true">${esc(b.signature)}</p>
+        ${b.button ? `<div class="btns wave-btns">${A(b.button.href, 'btn', esc(b.button.label))}</div>` : ''}
       </div>
     </div>
   </div>
@@ -165,13 +168,14 @@ function themeCss(t) {
 const SPRITE = readFileSync(resolve(ROOT, 'tools/sprite.svg'), 'utf8');
 
 function page(version) {
-  const base = version === 'lesson' ? '../' : '';
+  const base = version === 'lesson' ? '../../' : '../';
   MEDIA = base + 'media/';
   const useful = C.blocks.map(b => R[b.type](b)).join('\n');
+  const LANGNAV = `<nav class="langs" aria-label="Язык гайда">${LANGS.map(l => `<a class="lang-a${l === C.lang ? ' on' : ''}" href="${base}${l}/${version === 'lesson' ? 'lesson/' : ''}" hreflang="${l}"${l === C.lang ? ' aria-current="page"' : ''}>${l.toUpperCase()}</a>`).join('')}</nav>`;
   const hero = useful.split('\n</section>')[0] + '\n</section>';
   const restUseful = C.blocks.slice(1).map(b => R[b.type](b)).join('\n');
   const tail = version === 'ad'
-    ? `<div class="ad" data-ad="${C.ad}">\n${AD.blocks.map(b => R[b.type](b)).join('\n')}\n</div>\n${footer(AD.footer)}`
+    ? `<div class="ad" data-ad="${C.lang}">\n${AD.blocks.map(b => R[b.type](b)).join('\n')}\n</div>\n${footer(AD.footer)}`
     : `${C.ending.map(b => R[b.type](b)).join('\n')}\n${footer(C.lessonFooter)}`;
   const nav = version === 'ad' ? AD.footer.nav : C.lessonFooter.nav;
   const t = C.meta;
@@ -196,6 +200,7 @@ function page(version) {
 <body class="v-${version}">
 ${SPRITE}
 <a class="skip" href="#about">К содержанию</a>
+${LANGNAV}
 <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
 <div class="menu" id="menu" hidden>
   <button class="menu-x" type="button" aria-label="Закрыть меню">${ico('close')}</button>
@@ -214,7 +219,21 @@ ${tail}
 `;
 }
 
+const redirect = (to, title) => `<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title><meta http-equiv="refresh" content="0; url=${to}"><link rel="canonical" href="${to}">
+<script>location.replace(${JSON.stringify(to)} + location.hash)</script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;font:600 18px/1.4 system-ui,sans-serif;background:#1C84D4;color:#fff}a{color:#F7F92E}</style>
+</head><body><p>Открываем гайд: <a href="${to}">${to}</a></p></body></html>
+`;
+for (const lang of LANGS) {
+  C = JSON.parse(readFileSync(resolve(ROOT, `content.${lang}.json`), 'utf8'));
+  AD = C.ad;
+  mkdirSync(resolve(ROOT, `gh/${lang}/lesson`), { recursive: true });
+  writeFileSync(resolve(ROOT, `gh/${lang}/index.html`), page('ad'));
+  writeFileSync(resolve(ROOT, `gh/${lang}/lesson/index.html`), page('lesson'));
+}
 mkdirSync(resolve(ROOT, 'gh/lesson'), { recursive: true });
-writeFileSync(resolve(ROOT, 'gh/index.html'), page('ad'));
-writeFileSync(resolve(ROOT, 'gh/lesson/index.html'), page('lesson'));
-console.log(`OK: gh/index.html (реклама: ${C.ad}), gh/lesson/index.html`);
+writeFileSync(resolve(ROOT, 'gh/index.html'), redirect('en/', 'Гайд'));
+writeFileSync(resolve(ROOT, 'gh/lesson/index.html'), redirect('../tr/lesson/', 'Гайд'));
+console.log('OK: gh/en/, gh/en/lesson/, gh/tr/, gh/tr/lesson/; gh/ → en/, gh/lesson/ → tr/lesson/');
