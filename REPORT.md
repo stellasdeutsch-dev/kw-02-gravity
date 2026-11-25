@@ -1,14 +1,40 @@
 # Сайт 02: отчёт
 
-## Ссылки (две вариации, 25.11.2026)
-- Корень, ведёт на `/en/`: https://stellasdeutsch-dev.github.io/kw-02-gravity/
-- EN, реклама Dias English: https://stellasdeutsch-dev.github.io/kw-02-gravity/en/
-- EN без рекламы: https://stellasdeutsch-dev.github.io/kw-02-gravity/en/lesson/
-- TR, реклама Alterna Timur: https://stellasdeutsch-dev.github.io/kw-02-gravity/tr/
-- TR без рекламы: https://stellasdeutsch-dev.github.io/kw-02-gravity/tr/lesson/
-- Старый `/lesson/` ведёт на `/tr/lesson/`
+## Ссылки (только реклама, 25.11.2026)
+- EN, реклама Dias English, на фото только Диас: https://stellasdeutsch-dev.github.io/kw-02-gravity/en/
+- TR, реклама Alterna Timur, на фото только Тимур: https://stellasdeutsch-dev.github.io/kw-02-gravity/tr/
+- Старые адреса: `/` → `/en/`, `/lesson/` → `/tr/`, `/en/lesson/` → `/en/`, `/tr/lesson/` → `/tr/`
 - Репозиторий: https://github.com/stellasdeutsch-dev/kw-02-gravity
-- Figma: https://www.figma.com/design/fGYyNVeZlQ6IjFAVxQXKIM — 4 секции: TR и EN, у каждой главная и урок, в каждой кадры 1440, 834 и 390
+- Figma: https://www.figma.com/design/fGYyNVeZlQ6IjFAVxQXKIM — 2 секции (TR и EN), в каждой кадры 1440, 834 и 390
+
+## Правка «фото перепутаны, все сайты с рекламой»
+- **Источники фото.** У каждой картинки с человеком найден исходный файл, таблица в `gh/media/PEOPLE.md`:
+
+| Файл на сайте | Исходный файл | Кто |
+|---|---|---|
+| `timur-author.webp` | `~/dias/timur-video/IMG_2855.HEIC` | Тимур |
+| `timur-avatar.webp` | `~/dias/timur-video/IMG_2855.HEIC` | Тимур |
+| `timur-story.webp` | `~/dias/timur-video/IMG_2843.HEIC` | Тимур |
+| `tm-cert.webp` | сертификат TÖMER, людей нет | Тимур |
+| `dias-author.webp` | `~/dias/dias photos/IMG_1690.HEIC` | Диас |
+| `dias-avatar.webp` | `~/dias/dias photos/IMG_1690.HEIC` | Диас |
+| `ds-study.webp` | `~/dias/shared/dias-photos-web/dias-IMG_2060.webp` | Диас |
+| `ds-colosseum.webp` | `~/dias/shared/dias-photos-web/dias-IMG_1690.webp` | Диас |
+
+  - `ds-study` и `ds-colosseum` раньше брались из папки сайта `~/dias/3/sharp`. Это те же кадры (сверено по картинке), теперь они собираются из папки Диаса. Фото без источника не нашлось, заменять ничего не пришлось.
+- **Один автор на вариацию.** В `/en/` нет ни слова и ни фото Тимура, в `/tr/` нет Диаса. Переключатель EN/TR в шапке убран: он вёл на страницу второго автора.
+- **Версий без рекламы нет.** `lesson/` больше не собирается, на старых адресах стоит переадресация на рекламу своей вариации. Из `content.*.json` убраны блоки урока (`ending`, `lessonFooter`). Удалены 4 картинки, которые нигде не использовались.
+- **Цена.** На сайте и в Figma только «30 €». Долларов и цен «в месяц» нет ни в тексте, ни на картинках: все скриншоты платформ просмотрены глазами (на одном есть шкала прогресса «Month: 100», это не цена).
+- **Вырезки без каймы.** Тимур, Диас, лошадь и шляпа заново вырезаны из оригиналов скилом `cutout`, очищены `defringe.py` (`--erode 2`, у Тимура `--erode 3`). У Тимура в кудрях после этого оставались просветы белой стены: они переведены в прозрачность через разделение цвета волос и стены, кожа не тронута. Тень `drop-shadow` под лошадью убрана. Сборка: `python3 tools/build-people.py`.
+- **Figma.** Удалены секции «Урок» и переключатели языка, во всех кадрах заменены лошадь, фото и аватарки авторов, шляпа. Скриптом проверено: в TR нет Диаса, в EN нет Тимура, нет `$` и «в месяц», старых картинок не осталось.
+
+## Проверки этой правки
+- Края вырезок на белом, чёрном, синем и розовом: `qa/edges/02_edge_*.jpg`; на фоне сайта: `qa/edges/02_site_*.png`.
+- QA ниже обновлён под новые требования отдельным коммитом: убраны страницы `lesson`, добавлены проверки «люди только своего автора», «нет `$` и цен в месяц», новые переадресации и отсутствие переключателя языка.
+
+---
+
+## Вторая версия (две вариации, с lesson)
 
 ## Вариации EN и TR
 - Шаблон один: `content.en.json` и `content.tr.json`. `node tools/build.mjs` собирает обе вариации, их `lesson` и переадресации.

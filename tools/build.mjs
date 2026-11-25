@@ -1,6 +1,6 @@
 // Сборка сайта 02 из content.en.json и content.tr.json:
-// gh/en/ и gh/tr/ (с рекламой), gh/en/lesson/ и gh/tr/lesson/ (без рекламы),
-// gh/index.html ведёт на /en/, старые /lesson/ ведёт на /tr/lesson/.
+// gh/en/ (реклама Dias English) и gh/tr/ (реклама Alterna Timur). Версий без рекламы нет.
+// Старые адреса: gh/ → /en/, gh/lesson/ → /tr/, gh/en/lesson/ → /en/, gh/tr/lesson/ → /tr/.
 // Запуск из папки сайта: node tools/build.mjs
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -167,17 +167,14 @@ function themeCss(t) {
 
 const SPRITE = readFileSync(resolve(ROOT, 'tools/sprite.svg'), 'utf8');
 
-function page(version) {
-  const base = version === 'lesson' ? '../../' : '../';
+function page() {
+  const base = '../';
   MEDIA = base + 'media/';
   const useful = C.blocks.map(b => R[b.type](b)).join('\n');
-  const LANGNAV = `<nav class="langs" aria-label="Язык гайда">${LANGS.map(l => `<a class="lang-a${l === C.lang ? ' on' : ''}" href="${base}${l}/${version === 'lesson' ? 'lesson/' : ''}" hreflang="${l}"${l === C.lang ? ' aria-current="page"' : ''}>${l.toUpperCase()}</a>`).join('')}</nav>`;
   const hero = useful.split('\n</section>')[0] + '\n</section>';
   const restUseful = C.blocks.slice(1).map(b => R[b.type](b)).join('\n');
-  const tail = version === 'ad'
-    ? `<div class="ad" data-ad="${C.lang}">\n${AD.blocks.map(b => R[b.type](b)).join('\n')}\n</div>\n${footer(AD.footer)}`
-    : `${C.ending.map(b => R[b.type](b)).join('\n')}\n${footer(C.lessonFooter)}`;
-  const nav = version === 'ad' ? AD.footer.nav : C.lessonFooter.nav;
+  const tail = `<div class="ad" data-ad="${C.lang}">\n${AD.blocks.map(b => R[b.type](b)).join('\n')}\n</div>\n${footer(AD.footer)}`;
+  const nav = AD.footer.nav;
   const t = C.meta;
   return `<!doctype html>
 <html lang="ru">
@@ -197,14 +194,13 @@ function page(version) {
 <style>${themeCss(C.theme)}</style>
 <script src="${base}assets/app.js" defer></script>
 </head>
-<body class="v-${version}">
+<body class="v-ad">
 ${SPRITE}
 <a class="skip" href="#about">К содержанию</a>
-${LANGNAV}
 <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
 <div class="menu" id="menu" hidden>
   <button class="menu-x" type="button" aria-label="Закрыть меню">${ico('close')}</button>
-  <nav aria-label="Меню">${nav.map(([l, h]) => A(h, 'menu-a', esc(l))).join('')}${version === 'ad' ? A('BUY', 'btn', 'Купить доступ') : ''}</nav>
+  <nav aria-label="Меню">${nav.map(([l, h]) => A(h, 'menu-a', esc(l))).join('')}${A('BUY', 'btn', 'Купить доступ')}</nav>
 </div>
 <main>
 ${hero}
@@ -230,10 +226,10 @@ for (const lang of LANGS) {
   C = JSON.parse(readFileSync(resolve(ROOT, `content.${lang}.json`), 'utf8'));
   AD = C.ad;
   mkdirSync(resolve(ROOT, `gh/${lang}/lesson`), { recursive: true });
-  writeFileSync(resolve(ROOT, `gh/${lang}/index.html`), page('ad'));
-  writeFileSync(resolve(ROOT, `gh/${lang}/lesson/index.html`), page('lesson'));
+  writeFileSync(resolve(ROOT, `gh/${lang}/index.html`), page());
+  writeFileSync(resolve(ROOT, `gh/${lang}/lesson/index.html`), redirect('../', 'Гайд'));
 }
 mkdirSync(resolve(ROOT, 'gh/lesson'), { recursive: true });
 writeFileSync(resolve(ROOT, 'gh/index.html'), redirect('en/', 'Гайд'));
-writeFileSync(resolve(ROOT, 'gh/lesson/index.html'), redirect('../tr/lesson/', 'Гайд'));
-console.log('OK: gh/en/, gh/en/lesson/, gh/tr/, gh/tr/lesson/; gh/ → en/, gh/lesson/ → tr/lesson/');
+writeFileSync(resolve(ROOT, 'gh/lesson/index.html'), redirect('../tr/', 'Гайд'));
+console.log('OK: gh/en/, gh/tr/; переадресации: gh/ → en/, gh/lesson/ → tr/, gh/en/lesson/ → en/, gh/tr/lesson/ → tr/');
