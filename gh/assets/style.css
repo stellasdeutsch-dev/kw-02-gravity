@@ -90,7 +90,7 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .sheet-tab::before,.sheet-tab::after{content:"";position:absolute;bottom:0;width:30px;height:30px;background:radial-gradient(circle at 0 0,transparent 29px,var(--white) 30px)}
 .sheet-tab::before{left:-30px;background:radial-gradient(circle at 0 0,transparent 29px,var(--white) 30px)}
 .sheet-tab::after{right:-30px;background:radial-gradient(circle at 100% 0,transparent 29px,var(--white) 30px)}
-.sheet-tab .ic{box-sizing:content-box;width:22px;height:22px;padding:10px;border-radius:50%;background:var(--pink);color:var(--ink);transition:background-color .3s;animation:nudge 2.4s var(--ease) infinite}
+.sheet-tab .ic{box-sizing:content-box;width:22px;height:22px;padding:10px;border-radius:50%;background:var(--pink);color:var(--ink);transition:background-color .3s;animation:nudge 2.4s var(--ease) 3}
 .sheet-tab:hover .ic{background:var(--yellow)}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
@@ -251,8 +251,46 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .fl:hover{opacity:.7}
 
 /* появление при прокрутке */
-.js .rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.js .rv{opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease) var(--d,0s),transform .6s var(--ease) var(--d,0s)}
 .js .rv.in{opacity:1;transform:none}
+/* у карточек после появления свой быстрый hover */
+.js .card.rv.done{transition:transform .4s var(--ease)}
+.js .card.rv.done:hover{transform:translateY(-6px)}
+/* цена появляется заметно */
+.js .rv-pop{opacity:0;transform:scale(.7);transform-origin:left bottom;transition:opacity .5s var(--ease) .15s,transform .7s cubic-bezier(.2,1.5,.4,1) .15s}
+.js .rv-pop.in{opacity:1;transform:none}
+
+/* ---------- живой сайт: иконки, схемы, картинки ---------- */
+.stat-ic{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;margin-bottom:18px;color:var(--ink);transition:transform .35s var(--ease)}
+.stat-ic .ic{width:26px;height:26px}
+.stat:hover .stat-ic{transform:translateY(-3px) rotate(-6deg)}
+.btn .ic{width:20px;height:20px;transition:transform .3s var(--ease)}
+.btn:hover .ic{transform:translateX(2px) rotate(-6deg)}
+.prog-btn .btn:hover .ic{transform:translateY(3px)}
+.btn:active{transform:scale(.97)}
+.qa-q{display:flex;align-items:center;gap:16px}
+.qa-i{display:grid;place-items:center;flex:none;width:46px;height:46px;border-radius:50%;background:var(--blue);color:var(--ink);transition:transform .35s var(--ease),background-color .45s}
+.qa-i .ic{width:22px;height:22px}
+.qa:not(.open):hover .qa-i{transform:rotate(-10deg) scale(1.06)}
+.qa.open .qa-i{background:var(--white)}
+.price-list li .ic{transition:transform .3s var(--ease)}
+.price-list li:hover .ic{transform:translateY(-2px) rotate(-8deg)}
+.statement.has-pic{display:grid;grid-template-columns:minmax(0,1fr) clamp(180px,24vw,340px);align-items:center;gap:clamp(24px,4vw,60px)}
+.st-pic{margin:0}
+.st-pic img{width:100%;height:auto;transition:transform .5s var(--ease)}
+.st-pic:hover img{transform:translateY(-6px) rotate(-3deg)}
+.scheme{position:relative;margin-top:clamp(36px,4vw,56px)}
+.sc-list{position:relative;list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:16px}
+.sc-line{position:absolute;left:8%;right:8%;top:32px;height:3px;border-radius:3px;background:var(--ink);opacity:.14;transform-origin:left center}
+.js .scheme .sc-line{transform:scaleX(0);transition:transform 1.2s var(--ease) .2s}
+.js .scheme.in .sc-line{transform:none}
+.sc-it{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.sc-dot{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;font-family:var(--f-display);font-weight:900;font-size:28px;color:var(--ink);transition:transform .35s var(--ease)}
+.sc-dot .ic{width:28px;height:28px}
+.sc-it:hover .sc-dot{transform:translateY(-4px) scale(1.05)}
+.sc-it b{font-size:clamp(17px,1.5vw,21px);font-weight:600}
+.sc-v{font-family:var(--f-display);font-weight:900;font-size:clamp(54px,5vw,72px);line-height:.8;color:var(--pink)}
+.sc-v small{font-size:.42em;margin-left:.1em;color:var(--ink)}
 
 /* ---------- планшет ---------- */
 @media (max-width:1024px){
@@ -299,6 +337,17 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
   .row h3{grid-area:t;font-size:22px}
   .row p{grid-area:x}
   .row-pic{grid-area:p;width:auto;height:76px}
+  .statement.has-pic{grid-template-columns:1fr;gap:20px}
+  .st-pic{width:min(240px,62%);justify-self:center}
+  .sc-list{grid-auto-flow:row;grid-auto-columns:auto;gap:18px}
+  .sc-line{left:31px;right:auto;top:20px;bottom:20px;width:3px;height:auto;transform-origin:center top}
+  .js .scheme .sc-line{transform:scaleY(0)}
+  .sc-it{flex-direction:row;text-align:left;gap:16px}
+  .sc-it b{order:3}
+  .sc-dot{width:56px;height:56px;font-size:24px;flex:none}
+  .sc-v{font-size:48px}
+  .qa-i{width:38px;height:38px}
+  .qa-q{gap:12px}
   .sec-head{align-items:center}
   .arrows{gap:6px}
   .arr{width:44px}
@@ -330,5 +379,6 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .js .rv{opacity:1;transform:none}
+  .js .rv,.js .rv-pop{opacity:1;transform:none}
+  .js .scheme .sc-line{transform:none}
 }

@@ -19,6 +19,7 @@
 | `dias-avatar.webp` | `/en/`, плашка «Автор: Диас» | `~/dias/shared/dias-photos-web/dias-IMG_8898-3.webp` (квадрат вокруг лица) | Диас |
 
 Остальные картинки без авторов:
+- `en-books.webp`, `en-london.webp` (только `/en/`), `tr-tea.webp`, `tr-istanbul.webp` (только `/tr/`) — генерации ElevenLabs, предметы без людей, вырезаны `cutout` + `defringe.py`.
 - `hero-horse.webp`, `pic-hat.webp` — генерации ElevenLabs, вырезаны скилом `cutout` и очищены `defringe.py`. `pic-cart.webp`, `pic-flower.webp`, `pic-sneakers.webp`, `pic-balloons.webp` — генерации целиком.
 - `ds-*` (экраны) — платформа Dias English, `tm-ph-*`, `tm-n-*`, `tm-notion-*` — Alterna Timur. На них только стоковые картинки тем внутри платформы, Диаса и Тимура нет.
 - `tm-rv*` — отзывы из сообщений, имена и аватарки убраны.

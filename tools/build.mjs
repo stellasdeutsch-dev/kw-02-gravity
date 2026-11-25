@@ -21,6 +21,8 @@ const link = (href) => href === 'BUY' ? AD.buy : href;
 const ext = href => /^https?:/.test(href);
 const A = (href, cls, inner, extra = '') => {
   const h = link(href);
+  // у кнопок покупки иконка корзины
+  if (href === 'BUY' && /\bbtn\b/.test(cls) && !inner.includes('<svg')) inner = `${ico('cart')}<span>${inner}</span>`;
   return `<a class="${cls}" href="${attr(h)}"${ext(h) ? ' target="_blank" rel="noopener"' : ''}${extra}>${inner}</a>`;
 };
 const ico = (id, cls = 'ic') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
@@ -49,14 +51,14 @@ const R = {
 </section>`;
   },
   about(b) {
-    const stats = (b.stats || []).map((s, i) => `<div class="stat rv"><span class="stat-v ${[0,3].includes(i % 4) ? 't-pink' : 't-blue'}">${esc(s.value)}${s.unit ? `<small>${esc(s.unit)}</small>` : ''}</span><b>${T(s.title)}</b><span class="stat-s">${T(s.sub)}</span></div>`).join('');
+    const stats = (b.stats || []).map((s, i) => `<div class="stat rv">${s.icon ? `<span class="stat-ic c-${['pink', 'blue', 'yellow', 'pink'][i % 4]}">${ico(s.icon)}</span>` : ''}<span class="stat-v ${[0,3].includes(i % 4) ? 't-pink' : 't-blue'}">${/^\d+$/.test(s.value) ? `<span class="num" data-count="${s.value}">${s.value}</span>` : esc(s.value)}${s.unit ? `<small>${esc(s.unit)}</small>` : ''}</span><b>${T(s.title)}</b><span class="stat-s">${T(s.sub)}</span></div>`).join('');
     return `<section class="sec about" id="${b.id}" data-block="about">
   <div class="lead-wrap rv"><p class="label">${T(b.label)}</p><p class="lead indent">${T(b.text)}</p></div>
   <div class="col2">
     ${b.note ? `<p class="note rv">${T(b.note)}</p>` : ''}
     ${b.button ? `<div class="btns rv">${A(b.button.href, 'btn', esc(b.button.label))}</div>` : ''}
   </div>
-  ${stats ? `<div class="stats-wrap"><p class="label rv">${T(b.statsLabel)}</p><div class="stats">${stats}</div></div>` : ''}
+  ${stats ? `<div class="stats-wrap"><p class="label rv">${T(b.statsLabel)}</p><div class="stats" data-stagger>${stats}</div></div>` : ''}
 </section>`;
   },
   program(b) {
@@ -64,7 +66,7 @@ const R = {
     return `<section class="sec program" id="${b.id}" data-block="program">
   <div class="lead-wrap rv"><div class="label-row"><p class="label">${T(b.label)}</p><div class="avs" aria-hidden="true">${av}</div></div><p class="lead indent">${T(b.text)}</p></div>
   <div class="prog-row">
-    <div class="prog-btn rv">${A(b.button.href, 'btn', esc(b.button.label))}</div>
+    <div class="prog-btn rv">${A(b.button.href, 'btn', (b.button.icon ? ico(b.button.icon) : '') + `<span>${esc(b.button.label)}</span>`)}</div>
     <figure class="prog-pic rv">${img(b.image.src, b.image.w, b.image.h, b.image.alt)}</figure>
     <div class="prog-txt rv">${b.paras.map(p => `<p class="note">${T(p)}</p>`).join('')}</div>
   </div>
@@ -74,22 +76,25 @@ const R = {
     const items = b.items.map((r, i) => `<div class="row c-${r.color || ROWC[i % ROWC.length]} rv"><h3>${T(r.title)}</h3><p>${T(r.text)}</p>${r.img ? imgAuto(r.img, r.alt, 'row-pic') : '<span></span>'}</div>`).join('');
     return `<section class="sec rows-sec" id="${b.id || ''}" data-block="rows">
   ${b.title ? `<h2 class="display rv">${T(b.title)}</h2>` : ''}
-  <div class="rows">${items}</div>
+  <div class="rows" data-stagger>${items}</div>
 </section>`;
   },
   statement(b) {
-    return `<section class="sec statement" data-block="statement"${b.id ? ` id="${b.id}"` : ''}>
-  <p class="lead big rv">${T(b.text)}</p>
-  ${b.button ? `<div class="btns rv">${A(b.button.href, 'btn', esc(b.button.label))}</div>` : ''}
+    const pic = b.pic ? `<figure class="st-pic rv">${imgAuto(b.pic.src, b.pic.alt)}</figure>` : '';
+    return `<section class="sec statement${b.pic ? ' has-pic' : ''}" data-block="statement"${b.id ? ` id="${b.id}"` : ''}>
+  <div class="st-main"><p class="lead big rv">${T(b.text)}</p>
+  ${b.button ? `<div class="btns rv">${A(b.button.href, 'btn', esc(b.button.label))}</div>` : ''}</div>
+  ${pic}
+  ${b.scheme ? scheme(b.scheme) : ''}
 </section>`;
   },
   cards(b) {
-    const items = b.items.map((c, i) => `<article class="card c-${c.color || COLORS[i % 3]}"><div class="card-ph">${img(c.img, c.w, c.h, c.alt)}</div><div class="card-cap"><b>${T(c.name)}</b><span>${T(c.sub)}</span></div></article>`).join('');
+    const items = b.items.map((c, i) => `<article class="card rv c-${c.color || COLORS[i % 3]}"><div class="card-ph">${img(c.img, c.w, c.h, c.alt)}</div><div class="card-cap"><b>${T(c.name)}</b><span>${T(c.sub)}</span></div></article>`).join('');
     const big = b.big ? `<figure class="big rv"><div class="brw"><div class="brw-bar"><i></i><i></i><i></i></div>${img(b.big.img, b.big.w, b.big.h, b.big.alt)}</div><figcaption><b>${T(b.big.name)}</b><span>${T(b.big.sub)}</span></figcaption></figure>` : '';
     return `<section class="sec cards-sec" id="${b.id}" data-block="cards">
   <div class="sec-head rv"><h2 class="display">${T(b.title)}</h2>${arrows()}</div>
   ${big}
-  <div class="car rv" data-car><div class="car-track">${items}</div></div>
+  <div class="car rv" data-car><div class="car-track" data-stagger>${items}</div></div>
 </section>`;
   },
   reviews(b) {
@@ -104,8 +109,8 @@ const R = {
     return `<section class="sec price-sec" id="${b.id}" data-block="price">
   <h2 class="display rv">${T(b.title)}</h2>
   <div class="price-card rv">
-    <div class="price-l"><div class="pv">${esc(b.price)}</div><p class="ps">${T(b.sub)}</p></div>
-    <ul class="price-list">${b.list.map((l, i) => `<li>${ico(['grammar', 'words', 'play', 'exam', 'work', 'film', 'steps'][i % 7])}<span>${T(l)}</span></li>`).join('')}</ul>
+    <div class="price-l"><div class="pv rv-pop">${esc(b.price)}</div><p class="ps">${T(b.sub)}</p></div>
+    <ul class="price-list" data-stagger>${b.list.map((l, i) => `<li class="rv">${ico((b.icons || [])[i] || 'steps')}<span>${T(l)}</span></li>`).join('')}</ul>
     <div class="btns price-btns">${b.buttons.map(x => A(x.href, 'btn' + (x.line ? ' line' : ''), (x.icon ? ico(x.icon) : '') + `<span>${esc(x.label)}</span>`)).join('')}</div>
     ${b.note ? `<p class="price-note">${T(b.note)}</p>` : ''}
   </div>
@@ -115,13 +120,13 @@ const R = {
     const items = b.items.map((f, i) => {
       const id = `${b.id}-a${i + 1}`;
       return `<div class="qa${f.open ? ' open' : ''}">
-    <button class="qa-btn" type="button" aria-expanded="${f.open ? 'true' : 'false'}" aria-controls="${id}"><span class="qa-n">${String(i + 1).padStart(2, '0')}</span><span class="qa-q">${T(f.q)}</span><span class="qa-ic" aria-hidden="true"><i></i><i></i></span></button>
+    <button class="qa-btn" type="button" aria-expanded="${f.open ? 'true' : 'false'}" aria-controls="${id}"><span class="qa-n">${String(i + 1).padStart(2, '0')}</span><span class="qa-q">${f.icon ? `<span class="qa-i">${ico(f.icon)}</span>` : ''}<span>${T(f.q)}</span></span><span class="qa-ic" aria-hidden="true"><i></i><i></i></span></button>
     <div class="qa-a" id="${id}" role="region"><div class="qa-in">${f.img ? imgAuto(f.img, '', 'qa-pic') : ''}<p>${T(f.a)}</p></div></div>
   </div>`;
     }).join('');
     return `<section class="sec faq-sec" id="${b.id}" data-block="faq">
   <h2 class="display rv">${T(b.title)}</h2>
-  <div class="faq rv" data-faq>${items}</div>
+  <div class="faq" data-faq data-stagger>${items.replace(/<div class="qa(?=[" ])/g, '<div class="rv qa')}</div>
 </section>`;
   },
   author(b) {
@@ -141,6 +146,13 @@ const R = {
 </section>`;
   },
 };
+// схема: шаги дня (иконка, минуты) или маршрут уровней по городам; линия прорисовывается при появлении
+function scheme(sc) {
+  const items = sc.items.map((it, i) => sc.type === 'route'
+    ? `<li class="sc-it rv"><span class="sc-dot c-${['pink', 'yellow', 'blue', 'pink', 'yellow'][i % 5]}">${esc(it.k)}</span><b>${esc(it.label)}</b></li>`
+    : `<li class="sc-it rv"><span class="sc-dot c-${['pink', 'yellow', 'blue'][i % 3]}">${ico(it.icon)}</span><span class="sc-v"><span class="num" data-count="${it.v}">${esc(it.v)}</span><small>${esc(it.unit)}</small></span><b>${esc(it.label)}</b></li>`).join('');
+  return `<div class="scheme sc-${sc.type} rv" aria-hidden="false"><span class="sc-line" aria-hidden="true"></span><ol class="sc-list" data-stagger>${items}</ol></div>`;
+}
 function arrows() {
   return `<div class="arrows"><button type="button" class="arr prev" aria-label="Назад" disabled>${ico('arrow-l', 'ic-arr')}</button><button type="button" class="arr next" aria-label="Дальше">${ico('arrow-r', 'ic-arr')}</button></div>`;
 }

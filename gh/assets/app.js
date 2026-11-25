@@ -63,10 +63,32 @@
   });
 
   // ---- появление при прокрутке ----
-  var rv = $$('.rv');
-  if (reduce || !('IntersectionObserver' in window)) { rv.forEach(function (el) { el.classList.add('in'); }); return; }
+  // элементы группы появляются по очереди, шаг 80 мс
+  $$('[data-stagger]').forEach(function (g) {
+    [].slice.call(g.children).filter(function (c) { return c.classList.contains('rv'); }).forEach(function (c, i) { c.style.setProperty('--d', (Math.min(i, 8) * 0.08) + 's'); });
+  });
+  // после появления задержка снимается, чтобы hover был быстрым
+  D.addEventListener('transitionend', function (e) {
+    var t = e.target;
+    if (t.classList && t.classList.contains('rv') && t.classList.contains('in') && e.propertyName === 'transform') { t.style.setProperty('--d', '0s'); t.classList.add('done'); }
+  });
+  // счётчики набегают до своего числа
+  function count(el) {
+    var to = +el.getAttribute('data-count'), t0 = null, dur = 1100;
+    if (!to || el.hasAttribute('data-counted')) return;
+    el.setAttribute('data-counted', '');
+    function f(t) { if (!t0) t0 = t; var k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); }
+    el.textContent = '0'; requestAnimationFrame(f);
+  }
+  var rv = $$('.rv, .rv-pop');
+  if (reduce || !('IntersectionObserver' in window)) { rv.forEach(function (el) { el.classList.add('in', 'done'); }); return; }
   var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      // вложенные блоки (карточки в ленте карусели за краем экрана) появляются вместе с родителем
+      [e.target].concat($$('.rv, .rv-pop', e.target)).forEach(function (el) { el.classList.add('in'); io.unobserve(el); });
+      $$('.num', e.target).forEach(count);
+    });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   rv.forEach(function (el) { io.observe(el); });
 })();

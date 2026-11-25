@@ -30,4 +30,7 @@ webp(square(load(f'{DW}/dias-IMG_8898-3.webp'), .45, .4, .7), 'dias-avatar', 160
 # предметы (генерации ElevenLabs), вырезка без каймы
 webp(ImageOps.mirror(Image.open(f'{CUT}/horse-clean.png')), 'hero-horse', 1300)
 webp(Image.open(f'{CUT}/hat-clean.png'), 'pic-hat', 360)
+# картинки по теме языка для «живого сайта» (генерации ElevenLabs, вырезка cutout + defringe.py, ref/gen2/)
+for n in ['en-books', 'en-london', 'tr-tea', 'tr-istanbul']:
+    webp(Image.open(f'ref/gen2/{n}-clean.png'), n, 680)
 json.dump({os.path.basename(f): list(Image.open(f).size) for f in glob.glob(f'{OUT}/*.webp')}, open('tools/media-sizes.json', 'w'), indent=0)

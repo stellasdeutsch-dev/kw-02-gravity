@@ -87,6 +87,10 @@
 520,
 1125
 ],
+"en-london.webp": [
+680,
+356
+],
 "pic-flower.webp": [
 520,
 520
@@ -122,6 +126,10 @@
 "pic-cart.webp": [
 900,
 625
+],
+"en-books.webp": [
+680,
+539
 ],
 "tm-rv9.webp": [
 577,
@@ -163,6 +171,10 @@
 520,
 990
 ],
+"tr-istanbul.webp": [
+520,
+667
+],
 "timur-avatar.webp": [
 160,
 160
@@ -178,5 +190,9 @@
 "tm-ph-1924.webp": [
 520,
 990
+],
+"tr-tea.webp": [
+680,
+381
 ]
 }
