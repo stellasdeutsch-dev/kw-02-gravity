@@ -1,5 +1,40 @@
 # Сайт 02: отчёт
 
+## Ссылки (две вариации, 25.11.2026)
+- Корень, ведёт на `/en/`: https://stellasdeutsch-dev.github.io/kw-02-gravity/
+- EN, реклама Dias English: https://stellasdeutsch-dev.github.io/kw-02-gravity/en/
+- EN без рекламы: https://stellasdeutsch-dev.github.io/kw-02-gravity/en/lesson/
+- TR, реклама Alterna Timur: https://stellasdeutsch-dev.github.io/kw-02-gravity/tr/
+- TR без рекламы: https://stellasdeutsch-dev.github.io/kw-02-gravity/tr/lesson/
+- Старый `/lesson/` ведёт на `/tr/lesson/`
+- Репозиторий: https://github.com/stellasdeutsch-dev/kw-02-gravity
+- Figma: https://www.figma.com/design/fGYyNVeZlQ6IjFAVxQXKIM — 4 секции: TR и EN, у каждой главная и урок, в каждой кадры 1440, 834 и 390
+
+## Вариации EN и TR
+- Шаблон один: `content.en.json` и `content.tr.json`. `node tools/build.mjs` собирает обе вариации, их `lesson` и переадресации.
+- **Подход «Автор»** (сайт 02 по RULES.md): реклама начинается с блока «Кто автор» (фото в волнах, цитата, кнопка покупки), за ним идёт «Путь автора» тремя рядами с фото, дальше платформа, экраны, уровни, цена, вопросы, кнопка.
+  - Диас: Казыгурт → НИШ → Sapienza, Рим. Фото: портрет, у окна со словарём, у Колизея.
+  - Тимур: Шымкент, 22 года → Университет Акдениз в Анталье → TÖMER C1 и IELTS 7.5. Фото: два кадра Тимура и сертификат TÖMER.
+  - Все факты взяты с опубликованных сайтов (blok автора на 3/sharp, turkce-izafet, ALTERNA.md); цитаты дословные.
+- Примеры в пользе на языке вариации: EN «Nice to meet you.», «Could you help me?»…, TR «Memnun oldum.», «Yardım eder misiniz?»…, у фраз проставлен `lang`.
+- В шапке есть переключатель EN/TR, он ведёт на ту же версию другой вариации (с рекламой или без неё).
+- Корень: в сообщении было сказано и «корень ведёт на /en/», и «старый / ведёт на /tr/». Это один адрес, поэтому сделал по RULES.md: `/` ведёт на `/en/`, а старый `/lesson/` ведёт на `/tr/lesson/`.
+
+## Проверки после разделения (живой сайт)
+- Playwright, `--mute-audio`, 4 страницы × 3 ширины (1440, 834, 390): `ALL OK` (`qa/qa-report-live.json`).
+  - статус 200, `scrollWidth` равен ширине, бокового скролла нет;
+  - картинки загрузились все: EN 34, TR 41, lesson 16;
+  - ошибок в консоли 0;
+  - в EN все 7 ссылок покупки ведут на `lava.top/products/2c950aa0…` (Dias), в TR все 6 на `…/2cdbb9f8…` (Timur), в `lesson` ссылок покупки нет.
+- Переадресация: `/` → `/kw-02-gravity/en/`, `/lesson/` → `/kw-02-gravity/tr/lesson/`.
+- Интерактив: переключатель языка, вопросы, карусель, меню и Esc работают.
+- `curl` всех шести адресов вернул 200.
+- В Figma скриптом проверено: в EN нет текстов про Тимура и турецких фраз, в TR нет Диаса и английских фраз, технических имён слоёв нет.
+
+---
+
+## Первая версия (только TR)
+
 ## Ссылки
 - С рекламой: https://stellasdeutsch-dev.github.io/kw-02-gravity/
 - Без рекламы: https://stellasdeutsch-dev.github.io/kw-02-gravity/lesson/

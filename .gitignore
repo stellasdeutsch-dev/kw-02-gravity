@@ -10,3 +10,5 @@ qa/qa-report.json
 tools/figma/data/
 tools/figma/calls/
 tools/figma/store.js
+tools/figma/calls2/
+tools/figma/builder_body.txt

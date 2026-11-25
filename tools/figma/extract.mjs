@@ -4,7 +4,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 const BASE = process.argv[2] || 'http://127.0.0.1:8702/';
 const OUT = new URL('./data/', import.meta.url).pathname; mkdirSync(OUT, { recursive: true });
 const b = await chromium.launch({ channel: 'chrome', args: ['--mute-audio'] });
-for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) for (const w of [1440, 834, 390]) {
+for (const [ver, path] of [['en', 'en/'], ['enl', 'en/lesson/'], ['tr', 'tr/'], ['trl', 'tr/lesson/']]) for (const w of [1440, 834, 390]) {
   const p = await b.newPage({ viewport: { width: w, height: 900 } });
   await p.goto(BASE + path, { waitUntil: 'networkidle' });
   await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1!important;transform:none!important}.hero-horse{transform:none!important}' });
@@ -14,7 +14,7 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) for (const w of [
     const R = n => Math.round(n * 10) / 10;
     const hex = c => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const [r, g, bb, a = 1] = m[1].split(',').map(parseFloat); if (+a === 0) return null; return { c: '#' + [r, g, bb].map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase(), a: +a }; };
     const NAMES = { hero: 'Первый экран', about: 'О гайде', program: 'Как устроен гайд', rows: 'Шаги', statement: 'Вывод', cards: 'Примеры', faq: 'Вопросы', reviews: 'Отзывы', price: 'Цена', author: 'Автор', footer: 'Подвал' };
-    const BOX = { 'btn': 'Кнопка', 'card': 'Карточка', 'card-ph': 'Фото карточки', 'rcard': 'Карточка отзыва', 'rcard-shot': 'Скриншот отзыва', 'row': 'Ряд', 'qa': 'Вопрос', 'price-card': 'Карточка цены', 'foot': 'Подвал', 'soc': 'Соцсеть', 'sheet': 'Белый лист', 'sheet-tab': 'Язычок листа', 'hero-chip': 'Автор', 'brw': 'Окно браузера', 'brw-bar': 'Панель браузера', 'burger': 'Шапка', 'wave-photo': 'Фото автора', 'wave-text': 'Текст автора', 'car': 'Лента', 'car-track': 'Лента карточек', 'qa-ic': 'Плюс', 'stat': 'Цифра', 'arr': 'Стрелка', 'av': 'Аватар' };
+    const BOX = { 'btn': 'Кнопка', 'card': 'Карточка', 'card-ph': 'Фото карточки', 'rcard': 'Карточка отзыва', 'rcard-shot': 'Скриншот отзыва', 'row': 'Ряд', 'qa': 'Вопрос', 'price-card': 'Карточка цены', 'foot': 'Подвал', 'soc': 'Соцсеть', 'sheet': 'Белый лист', 'sheet-tab': 'Язычок листа', 'hero-chip': 'Автор', 'brw': 'Окно браузера', 'brw-bar': 'Панель браузера', 'burger': 'Шапка', 'wave-photo': 'Фото автора', 'wave-text': 'Текст автора', 'car': 'Лента', 'car-track': 'Лента карточек', 'qa-ic': 'Плюс', 'stat': 'Цифра', 'arr': 'Стрелка', 'av': 'Аватар', 'langs': 'Языки', 'lang-a': 'Язык' };
     const ROLE = [['hero-logo', 'Логотип'], ['hero-title', 'Заголовок первого экрана'], ['hero-sub', 'Подзаголовок первого экрана'], ['display', 'Заголовок секции'], ['lead', 'Крупный текст'], ['stat-v', 'Цифра'], ['qa-n', 'Номер вопроса'], ['qa-q', 'Вопрос'], ['pv', 'Цена'], ['sig', 'Подпись автора'], ['fc', 'Контакт'], ['foot-logo', 'Логотип'], ['btn', 'Кнопка'], ['menu-a', 'Меню'], ['label', 'Подпись'], ['row', 'Подзаголовок'], ['note', 'Мелкий текст'], ['card-cap', 'Подпись карточки'], ['rcard-top', 'Подпись карточки'], ['stat', 'Подпись цифры'], ['price-list', 'Пункт списка'], ['ps', 'Подзаголовок'], ['wave-head', 'Подпись карточки'], ['wave-q', 'Цитата'], ['foot', 'Мелкий текст'], ['qa-a', 'Мелкий текст'], ['hero-chip', 'Кнопка'], ['big', 'Подпись карточки'], ['price-note', 'Мелкий текст']];
     const roleOf = el => { for (const [c, r] of ROLE) if (el.closest('.' + c)) return r; return 'Текст'; };
     const SYMS = {}; document.querySelectorAll('symbol').forEach(s => SYMS[s.id] = s);
@@ -72,8 +72,9 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) for (const w of [
       return [f];
     }
     // корень: фон страницы, затем шапка, первый экран и лист
+    document.querySelector('.langs') && (document.querySelector('.langs').style.position = 'absolute');
     const page = { t: 'f', n: 'page', x: 0, y: 0, w: W, h: document.body.scrollHeight, grad: getComputedStyle(document.body).backgroundImage, ch: [] };
-    page.ch.push(...node(document.querySelector('.burger')), ...node(document.querySelector('.hero')), ...node(document.querySelector('.sheet')));
+    page.ch.push(...node(document.querySelector('.burger')), ...(document.querySelector('.langs') ? node(document.querySelector('.langs')) : []), ...node(document.querySelector('.hero')), ...node(document.querySelector('.sheet')));
     // пересчёт в относительные координаты
     const rel = (n, ox, oy) => { n.x = R(n.x - ox); n.y = R(n.y - oy); n.w = R(n.w); n.h = R(n.h); if (n.ch) n.ch.forEach(c => rel(c, ox + n.x, oy + n.y)); };
     rel(page, 0, 0);
