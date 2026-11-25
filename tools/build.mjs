@@ -37,8 +37,8 @@ const ROWC = ['blue', 'white', 'yellow', 'pink'];
 const R = {
   hero(b) {
     const len = b.logo.join(' ').length;
-    return `<section class="hero" id="${b.id || 'top'}" data-block="hero">
-  <div class="hero-logo" style="--len:${len}" aria-hidden="true"><span>${esc(b.logo[0])}</span> <span class="y">${esc(b.logo[1])}</span></div>
+    return `<section class="hero" id="${b.id || 'top'}" data-block="hero" style="--len:${len}">
+  <div class="hero-logo" aria-hidden="true"><span>${esc(b.logo[0])}</span> <span class="y">${esc(b.logo[1])}</span></div>
   <div class="hero-stage">
     ${img(b.image.src, b.image.w, b.image.h, b.image.alt, 'hero-horse', true)}
     <div class="hero-chip">${img(AD.person.avatar, 160, 160, '', '', true)}<span>Автор: ${esc(AD.person.name)}</span></div>
