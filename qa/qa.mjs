@@ -16,7 +16,8 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) {
     const res = await p.goto(BASE + path, { waitUntil: 'networkidle' });
     // прокрутить до конца, чтобы lazy-картинки загрузились
     await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 500) { window.scrollTo({ top: y, behavior: "instant" }); await new Promise(r => setTimeout(r, 80)); } window.scrollTo({ top: 0, behavior: "instant" }); });
-    await p.waitForTimeout(800);
+    // ждём, пока все картинки догрузятся (на GitHub Pages первая загрузка медленнее), максимум 15 с
+    await p.waitForFunction(() => [...document.images].every(i => i.complete), null, { timeout: 15000 }).catch(() => {});
     await p.evaluate(() => document.querySelectorAll('.rv').forEach(e => e.classList.add('in')));
     const m = await p.evaluate(async () => {
       const src = await (await fetch(location.href)).text();
