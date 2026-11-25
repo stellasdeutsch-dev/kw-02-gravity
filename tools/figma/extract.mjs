@@ -46,7 +46,7 @@ for (const [ver, path] of [['ad', ''], ['lesson', 'lesson/']]) for (const w of [
         return [{ t: 'v', n: 'Icon / ' + id.replace('i-', ''), x: r.x, y: r.y, w: r.w, h: r.h, svg }];
       }
       const bg = hex(cs.backgroundColor); const grad = cs.backgroundImage !== 'none' ? cs.backgroundImage : null;
-      const inset = cs.boxShadow.match(/inset 0px 0px 0px (\d+)px/); const insetCol = inset ? hex(cs.boxShadow.match(/rgba?\([^)]+\)/)[0]) : null;
+      const inset = cs.boxShadow.match(/0px 0px 0px (\d+)px inset/) || cs.boxShadow.match(/inset 0px 0px 0px (\d+)px/); const insetCol = inset ? hex(cs.boxShadow.match(/rgba?\([^)]+\)/)[0]) : null;
       const clipHidden = cs.overflow === 'hidden' || cs.overflowX === 'hidden';
       const clipPath = cs.clipPath && cs.clipPath !== 'none' ? cs.clipPath.match(/#(wv-[a-z0-9]+)/)?.[1] : null;
       const cls = [...el.classList];

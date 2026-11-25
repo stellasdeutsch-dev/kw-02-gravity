@@ -7,3 +7,6 @@ design/
 qa/compare/
 qa/*.png
 qa/qa-report.json
+tools/figma/data/
+tools/figma/calls/
+tools/figma/store.js
