@@ -15,7 +15,8 @@
   D.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) closeMenu(); });
   // кнопка меню темнеет, когда уходит с неба на белый лист
   var sheet = $('.sheet');
-  function burgerTone() { var t = sheet.getBoundingClientRect().top; burger.classList.toggle('dark', t < 60); }
+  var langs = $('.langs');
+  function burgerTone() { var t = sheet.getBoundingClientRect().top; burger.classList.toggle('dark', t < 60); if (langs) langs.classList.toggle('dark', t < 60); }
   addEventListener('scroll', burgerTone, { passive: true }); burgerTone();
 
   // ---- карусели ----

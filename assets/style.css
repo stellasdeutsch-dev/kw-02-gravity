@@ -67,6 +67,17 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .menu-x:hover{background:var(--pink)}
 .menu-x .ic{width:24px;height:24px}
 
+/* переключатель языка гайда */
+.langs{position:fixed;z-index:30;top:22px;right:clamp(16px,3vw,40px);display:flex;gap:4px;padding:4px;border-radius:99px;background:rgba(255,255,255,.18);transition:background-color .3s}
+.lang-a{min-width:44px;height:40px;padding:0 12px;border-radius:99px;display:grid;place-items:center;font-weight:600;font-size:14px;line-height:1;color:var(--white);transition:background-color .25s,color .25s}
+.lang-a:hover{background:rgba(255,255,255,.3)}
+.lang-a.on{background:var(--white);color:var(--ink)}
+.langs.dark{background:var(--white);box-shadow:0 2px 12px rgba(17,17,17,.12)}
+.langs.dark .lang-a{color:var(--ink)}
+.langs.dark .lang-a:hover{background:var(--blue)}
+.langs.dark .lang-a.on{background:var(--yellow)}
+.fx{font-style:normal}
+
 /* ---------- первый экран ---------- */
 .hero{position:relative;padding:clamp(78px,7vw,96px) 0 clamp(150px,14vw,200px);text-align:center;color:var(--white);overflow:hidden}
 .hero-logo{font-family:var(--f-display);font-weight:900;text-transform:var(--h-case);line-height:.78;letter-spacing:-.005em;white-space:nowrap;
@@ -141,7 +152,7 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .c-white{background:var(--white)}
 .c-yellow{background:var(--yellow)}
 .c-pink{background:var(--pink)}
-.rows-sec .display{margin-bottom:clamp(36px,3.4vw,50px)}
+.rows-sec .display,.author-sec .display{margin-bottom:clamp(36px,3.4vw,50px)}
 .statement{padding-top:0}
 
 /* карусели */
@@ -222,6 +233,7 @@ h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .wave-head span{display:block;font-size:var(--fs-small);color:#9a9a55}
 .wave-hat{width:clamp(70px,6.4vw,92px);height:auto;transform:rotate(-12deg)}
 .wave-q{margin-top:26px;font-size:15px;font-weight:600;line-height:1.38;max-width:24em}
+.wave-btns{margin-top:18px}
 .sig{font-family:var(--f-script);color:var(--pink);font-size:clamp(46px,4.6vw,66px);line-height:1;margin:22px 0 0 auto;transform:rotate(-9deg);width:max-content;padding-right:8%}
 
 /* подвал */
