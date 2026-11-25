@@ -4,8 +4,9 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 const BASE = process.argv[2] || 'http://127.0.0.1:8702/';
 const OUT = new URL('./data/', import.meta.url).pathname; mkdirSync(OUT, { recursive: true });
 const b = await chromium.launch({ channel: 'chrome', args: ['--mute-audio'] });
-for (const [ver, path] of [['en', 'en/'], ['enl', 'en/lesson/'], ['tr', 'tr/'], ['trl', 'tr/lesson/']]) for (const w of [1440, 834, 390]) {
-  const p = await b.newPage({ viewport: { width: w, height: 900 } });
+for (const [ver, path] of [['en', 'en/'], ['tr', 'tr/']]) for (const w of [1440, 834, 390]) {
+  // reducedMotion: всё сразу видно, счётчики стоят на своих числах
+  const ctx = await b.newContext({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce' }); const p = await ctx.newPage();
   await p.goto(BASE + path, { waitUntil: 'networkidle' });
   await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1!important;transform:none!important}.hero-horse{transform:none!important}' });
   await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { scrollTo({ top: y, behavior: 'instant' }); await new Promise(r => setTimeout(r, 40)); } scrollTo({ top: 0, behavior: 'instant' }); });
@@ -14,8 +15,8 @@ for (const [ver, path] of [['en', 'en/'], ['enl', 'en/lesson/'], ['tr', 'tr/'], 
     const R = n => Math.round(n * 10) / 10;
     const hex = c => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const [r, g, bb, a = 1] = m[1].split(',').map(parseFloat); if (+a === 0) return null; return { c: '#' + [r, g, bb].map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase(), a: +a }; };
     const NAMES = { hero: 'Первый экран', about: 'О гайде', program: 'Как устроен гайд', rows: 'Шаги', statement: 'Вывод', cards: 'Примеры', faq: 'Вопросы', reviews: 'Отзывы', price: 'Цена', author: 'Автор', footer: 'Подвал' };
-    const BOX = { 'btn': 'Кнопка', 'card': 'Карточка', 'card-ph': 'Фото карточки', 'rcard': 'Карточка отзыва', 'rcard-shot': 'Скриншот отзыва', 'row': 'Ряд', 'qa': 'Вопрос', 'price-card': 'Карточка цены', 'foot': 'Подвал', 'soc': 'Соцсеть', 'sheet': 'Белый лист', 'sheet-tab': 'Язычок листа', 'hero-chip': 'Автор', 'brw': 'Окно браузера', 'brw-bar': 'Панель браузера', 'burger': 'Шапка', 'wave-photo': 'Фото автора', 'wave-text': 'Текст автора', 'car': 'Лента', 'car-track': 'Лента карточек', 'qa-ic': 'Плюс', 'stat': 'Цифра', 'arr': 'Стрелка', 'av': 'Аватар', 'langs': 'Языки', 'lang-a': 'Язык' };
-    const ROLE = [['hero-logo', 'Логотип'], ['hero-title', 'Заголовок первого экрана'], ['hero-sub', 'Подзаголовок первого экрана'], ['display', 'Заголовок секции'], ['lead', 'Крупный текст'], ['stat-v', 'Цифра'], ['qa-n', 'Номер вопроса'], ['qa-q', 'Вопрос'], ['pv', 'Цена'], ['sig', 'Подпись автора'], ['fc', 'Контакт'], ['foot-logo', 'Логотип'], ['btn', 'Кнопка'], ['menu-a', 'Меню'], ['label', 'Подпись'], ['row', 'Подзаголовок'], ['note', 'Мелкий текст'], ['card-cap', 'Подпись карточки'], ['rcard-top', 'Подпись карточки'], ['stat', 'Подпись цифры'], ['price-list', 'Пункт списка'], ['ps', 'Подзаголовок'], ['wave-head', 'Подпись карточки'], ['wave-q', 'Цитата'], ['foot', 'Мелкий текст'], ['qa-a', 'Мелкий текст'], ['hero-chip', 'Кнопка'], ['big', 'Подпись карточки'], ['price-note', 'Мелкий текст']];
+    const BOX = { 'btn': 'Кнопка', 'card': 'Карточка', 'card-ph': 'Фото карточки', 'rcard': 'Карточка отзыва', 'rcard-shot': 'Скриншот отзыва', 'row': 'Ряд', 'qa': 'Вопрос', 'price-card': 'Карточка цены', 'foot': 'Подвал', 'soc': 'Соцсеть', 'sheet': 'Белый лист', 'sheet-tab': 'Язычок листа', 'hero-chip': 'Автор', 'brw': 'Окно браузера', 'brw-bar': 'Панель браузера', 'burger': 'Шапка', 'wave-photo': 'Фото автора', 'wave-text': 'Текст автора', 'car': 'Лента', 'car-track': 'Лента карточек', 'qa-ic': 'Плюс', 'stat': 'Цифра', 'arr': 'Стрелка', 'av': 'Аватар', 'stat-ic': 'Иконка цифры', 'qa-i': 'Иконка вопроса', 'sc-dot': 'Точка схемы', 'sc-line': 'Линия схемы', 'scheme': 'Схема', 'st-pic': 'Картинка' };
+    const ROLE = [['hero-logo', 'Логотип'], ['hero-title', 'Заголовок первого экрана'], ['hero-sub', 'Подзаголовок первого экрана'], ['display', 'Заголовок секции'], ['lead', 'Крупный текст'], ['stat-v', 'Цифра'], ['sc-v', 'Цифра'], ['sc-dot', 'Цифра'], ['sc-it', 'Подзаголовок'], ['qa-n', 'Номер вопроса'], ['qa-q', 'Вопрос'], ['pv', 'Цена'], ['sig', 'Подпись автора'], ['fc', 'Контакт'], ['foot-logo', 'Логотип'], ['btn', 'Кнопка'], ['menu-a', 'Меню'], ['label', 'Подпись'], ['row', 'Подзаголовок'], ['note', 'Мелкий текст'], ['card-cap', 'Подпись карточки'], ['rcard-top', 'Подпись карточки'], ['stat', 'Подпись цифры'], ['price-list', 'Пункт списка'], ['ps', 'Подзаголовок'], ['wave-head', 'Подпись карточки'], ['wave-q', 'Цитата'], ['foot', 'Мелкий текст'], ['qa-a', 'Мелкий текст'], ['hero-chip', 'Кнопка'], ['big', 'Подпись карточки'], ['price-note', 'Мелкий текст']];
     const roleOf = el => { for (const [c, r] of ROLE) if (el.closest('.' + c)) return r; return 'Текст'; };
     const SYMS = {}; document.querySelectorAll('symbol').forEach(s => SYMS[s.id] = s);
     const PY = window.scrollY;
@@ -84,6 +85,6 @@ for (const [ver, path] of [['en', 'en/'], ['enl', 'en/lesson/'], ['tr', 'tr/'], 
   const s = JSON.stringify(data);
   writeFileSync(`${OUT}${ver}_${w}.json`, s);
   console.log(ver, w, (s.length / 1024).toFixed(0) + 'KB');
-  await p.close();
+  await ctx.close();
 }
 await b.close();
